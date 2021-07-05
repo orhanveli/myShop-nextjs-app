@@ -1,18 +1,30 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState
+} from 'react';
 import { Checkbox, Stack, Box, Input, Spinner } from '@chakra-ui/react';
 
 import Card from '../shared/Card';
 import { getAllManifacturers } from '../../features/manufacturers/manufacturer.api';
-import { useDebounce } from '../../utils/hooks';
+import { useAppDispatch, useAppSelector, useDebounce } from '../../utils/hooks';
 import { ShopManufacturer } from '../../features/manufacturers/manufacturer.models';
+import {
+  selectProductsFilters,
+  setSelectedBrands
+} from '../../features/products/products.slice';
 
 interface Props {}
 
 function BrandSelectorCard({}: Props): ReactElement {
+  const productsFilters = useAppSelector(selectProductsFilters);
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(false);
   const [brandNameQuery, setBrandNameQuery] = useState('');
   const [allBrands, setAllBrands] = useState<ShopManufacturer[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<ShopManufacturer[]>([]);
 
   const debouncedSetBrandNameQuery = useDebounce(brandNameQuery, 500);
@@ -51,15 +63,29 @@ function BrandSelectorCard({}: Props): ReactElement {
     }
   }, [debouncedSetBrandNameQuery, allBrands]);
 
-  const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedBrands((prevBrands) => {
-      const all = [...prevBrands];
+  const handleCheck = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const all = [...productsFilters.selectedBrands];
       if (e.target.checked) {
         all.push(e.target.value);
+      } else {
+        const index = all.indexOf(e.target.value);
+        if (index > -1) {
+          all.splice(index, 1);
+        }
       }
-      return Array.from(new Set(all));
-    });
-  };
+      const newSelectedBrands = Array.from(new Set(all));
+      dispatch(setSelectedBrands(newSelectedBrands));
+    },
+    [productsFilters.selectedBrands]
+  );
+
+  const isBrandChecked = useCallback(
+    (brand) => {
+      return productsFilters.selectedBrands.indexOf(brand) > -1;
+    },
+    [productsFilters.selectedBrands]
+  );
 
   const renderFilteredBrands = () => {
     if (!filteredBrands || filteredBrands.length === 0) {
@@ -72,6 +98,7 @@ function BrandSelectorCard({}: Props): ReactElement {
             value={br.slug}
             onChange={handleCheck}
             key={br.slug}
+            isChecked={isBrandChecked(br.slug)}
             size="sm"
           >
             {br.name}

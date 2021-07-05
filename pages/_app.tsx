@@ -1,5 +1,7 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Provider } from 'react-redux';
 
+import { store } from '../store';
 import Topbar from '../components/shared/Topbar';
 
 const theme = extendTheme({
@@ -22,10 +24,12 @@ const theme = extendTheme({
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ChakraProvider theme={theme}>
-      <Topbar />
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <Provider store={store}>
+      <ChakraProvider theme={theme}>
+        <Topbar />
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </Provider>
   );
 }
 

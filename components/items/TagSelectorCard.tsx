@@ -1,14 +1,27 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState
+} from 'react';
 import { Checkbox, Stack, Box, Input, Spinner } from '@chakra-ui/react';
 
 import Card from '../shared/Card';
-import { useDebounce } from '../../utils/hooks';
+import { useAppDispatch, useAppSelector, useDebounce } from '../../utils/hooks';
 import { getAllTags } from '../../features/products/product.api';
+import {
+  selectProductsFilters,
+  setSelectedTags
+} from '../../features/products/products.slice';
 
 function TagSelectorCard(): ReactElement {
+  const productsFilters = useAppSelector(selectProductsFilters);
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(false);
   const [tagQuery, setTagQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [filteredTags, setFilteredTags] = useState<string[]>([]);
 
@@ -42,15 +55,29 @@ function TagSelectorCard(): ReactElement {
     }
   }, [debouncedSetTagQuery, allTags]);
 
-  const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedTags((prevTags) => {
-      const all = [...prevTags];
+  const handleCheck = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const all = [...productsFilters.selectedTags];
       if (e.target.checked) {
         all.push(e.target.value);
+      } else {
+        const index = all.indexOf(e.target.value);
+        if (index > -1) {
+          all.splice(index, 1);
+        }
       }
-      return Array.from(new Set(all));
-    });
-  };
+      const newSelectedTags = Array.from(new Set(all));
+      dispatch(setSelectedTags(newSelectedTags));
+    },
+    [productsFilters.selectedTags]
+  );
+
+  const isTagChecked = useCallback(
+    (tag) => {
+      return productsFilters.selectedTags.indexOf(tag) > -1;
+    },
+    [productsFilters.selectedTags]
+  );
 
   const renderFilteredTags = () => {
     if (!filteredTags || filteredTags.length === 0) {
@@ -63,6 +90,7 @@ function TagSelectorCard(): ReactElement {
             value={tag}
             key={`ft-${tag}`}
             onChange={handleCheck}
+            isChecked={isTagChecked(tag)}
             size="sm"
           >
             {tag}

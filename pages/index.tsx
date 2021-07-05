@@ -3,8 +3,14 @@ import Head from 'next/head';
 import { Container, Heading, Flex, Stack } from '@chakra-ui/react';
 
 import SidebarLeft from '../components/shared/SidebarLeft';
+import TagList from '../components/items/TagsList';
+import { useAppDispatch, useAppSelector } from '../utils/hooks';
+import { selectProductsFilters } from '../features/products/products.slice';
 
 export default function Home() {
+  const productsFilters = useAppSelector(selectProductsFilters);
+  const dispatch = useAppDispatch();
+
   return (
     <div>
       <Head>
@@ -17,10 +23,12 @@ export default function Home() {
           <Flex w="296px">
             <SidebarLeft />
           </Flex>
-          <Flex flexGrow={1}>
+          <Flex flexGrow={1} direction="column">
             <Heading as="h2" size="lg" marginBottom="4">
               Products
             </Heading>
+            <TagList />
+            <p>{productsFilters.orderBy}</p>
           </Flex>
           <Flex w="296px">sidebar</Flex>
         </Stack>
