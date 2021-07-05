@@ -8,3 +8,17 @@ export interface ShopProduct {
   manufacturer: string;
   itemType: string;
 }
+
+export interface ProductFilteringOptions {
+  tags?: string[];
+  brands?: string[];
+  itemTypes?: string[];
+  orderBy: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ProductListResponse {
+  products: ShopProduct[];
+  total: number;
+}

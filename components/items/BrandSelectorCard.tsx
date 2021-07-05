@@ -12,8 +12,9 @@ import { getAllManifacturers } from '../../features/manufacturers/manufacturer.a
 import { useAppDispatch, useAppSelector, useDebounce } from '../../utils/hooks';
 import { ShopManufacturer } from '../../features/manufacturers/manufacturer.models';
 import {
-  selectProductsFilters,
-  setSelectedBrands
+  addSelectedBrand,
+  removeSelectedBrand,
+  selectProductsFilters
 } from '../../features/products/products.slice';
 
 interface Props {}
@@ -32,7 +33,7 @@ function BrandSelectorCard({}: Props): ReactElement {
   const getData = async () => {
     setLoading(true);
     try {
-      const manufacturers = await getAllManifacturers();
+      const manufacturers = await getAllManifacturers(200);
       setAllBrands(manufacturers);
     } catch (error) {
       console.log(error);
@@ -46,16 +47,10 @@ function BrandSelectorCard({}: Props): ReactElement {
 
   useEffect(() => {
     if (debouncedSetBrandNameQuery && debouncedSetBrandNameQuery.length > 2) {
-      const splitedQuery = debouncedSetBrandNameQuery
-        .trim()
-        .toLowerCase()
-        .split(' ');
-
+      const splitedQuery = debouncedSetBrandNameQuery.trim().toLowerCase();
       setFilteredBrands(
         allBrands.filter((br) => {
-          return splitedQuery.every(
-            (sq) => br.name.toLowerCase().indexOf(sq) > -1
-          );
+          return br.name.toLowerCase().indexOf(splitedQuery) > -1;
         })
       );
     } else {
@@ -63,22 +58,13 @@ function BrandSelectorCard({}: Props): ReactElement {
     }
   }, [debouncedSetBrandNameQuery, allBrands]);
 
-  const handleCheck = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const all = [...productsFilters.selectedBrands];
-      if (e.target.checked) {
-        all.push(e.target.value);
-      } else {
-        const index = all.indexOf(e.target.value);
-        if (index > -1) {
-          all.splice(index, 1);
-        }
-      }
-      const newSelectedBrands = Array.from(new Set(all));
-      dispatch(setSelectedBrands(newSelectedBrands));
-    },
-    [productsFilters.selectedBrands]
-  );
+  const handleCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      dispatch(addSelectedBrand(e.target.value));
+    } else {
+      dispatch(removeSelectedBrand(e.target.value));
+    }
+  }, []);
 
   const isBrandChecked = useCallback(
     (brand) => {

@@ -11,8 +11,9 @@ import Card from '../shared/Card';
 import { useAppDispatch, useAppSelector, useDebounce } from '../../utils/hooks';
 import { getAllTags } from '../../features/products/product.api';
 import {
-  selectProductsFilters,
-  setSelectedTags
+  addSelectedTag,
+  removeSelectedTag,
+  selectProductsFilters
 } from '../../features/products/products.slice';
 
 function TagSelectorCard(): ReactElement {
@@ -55,22 +56,13 @@ function TagSelectorCard(): ReactElement {
     }
   }, [debouncedSetTagQuery, allTags]);
 
-  const handleCheck = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const all = [...productsFilters.selectedTags];
-      if (e.target.checked) {
-        all.push(e.target.value);
-      } else {
-        const index = all.indexOf(e.target.value);
-        if (index > -1) {
-          all.splice(index, 1);
-        }
-      }
-      const newSelectedTags = Array.from(new Set(all));
-      dispatch(setSelectedTags(newSelectedTags));
-    },
-    [productsFilters.selectedTags]
-  );
+  const handleCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      dispatch(addSelectedTag(e.target.value));
+    } else {
+      dispatch(removeSelectedTag(e.target.value));
+    }
+  }, []);
 
   const isTagChecked = useCallback(
     (tag) => {

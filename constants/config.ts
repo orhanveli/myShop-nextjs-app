@@ -9,6 +9,7 @@ export const config = {
       { value: 'price-high-2-low', label: 'Price High to low' },
       { value: 'new-2-old', label: 'New to Old' },
       { value: 'old-2-new', label: 'Old to New' }
-    ]
+    ],
+    productCountPerPage: 16
   }
 };
