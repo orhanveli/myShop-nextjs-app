@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
 import { Checkbox, Stack, Box, Input, Spinner } from '@chakra-ui/react';
 
 import Card from '../shared/Card';
@@ -8,6 +8,7 @@ import { getAllTags } from '../../features/products/product.api';
 function TagSelectorCard(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [tagQuery, setTagQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [filteredTags, setFilteredTags] = useState<string[]>([]);
 
@@ -41,6 +42,16 @@ function TagSelectorCard(): ReactElement {
     }
   }, [debouncedSetTagQuery, allTags]);
 
+  const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedTags((prevTags) => {
+      const all = [...prevTags];
+      if (e.target.checked) {
+        all.push(e.target.value);
+      }
+      return Array.from(new Set(all));
+    });
+  };
+
   const renderFilteredTags = () => {
     if (!filteredTags || filteredTags.length === 0) {
       return null;
@@ -48,7 +59,12 @@ function TagSelectorCard(): ReactElement {
     return (
       <>
         {filteredTags.map((tag) => (
-          <Checkbox value={tag} key={`ft-${tag}`} size="sm">
+          <Checkbox
+            value={tag}
+            key={`ft-${tag}`}
+            onChange={handleCheck}
+            size="sm"
+          >
             {tag}
           </Checkbox>
         ))}

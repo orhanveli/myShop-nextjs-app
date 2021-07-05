@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
 import { Checkbox, Stack, Box, Input, Spinner } from '@chakra-ui/react';
 
 import Card from '../shared/Card';
@@ -12,7 +12,7 @@ function BrandSelectorCard({}: Props): ReactElement {
   const [loading, setLoading] = useState(false);
   const [brandNameQuery, setBrandNameQuery] = useState('');
   const [allBrands, setAllBrands] = useState<ShopManufacturer[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<ShopManufacturer[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<ShopManufacturer[]>([]);
 
   const debouncedSetBrandNameQuery = useDebounce(brandNameQuery, 500);
@@ -51,6 +51,16 @@ function BrandSelectorCard({}: Props): ReactElement {
     }
   }, [debouncedSetBrandNameQuery, allBrands]);
 
+  const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedBrands((prevBrands) => {
+      const all = [...prevBrands];
+      if (e.target.checked) {
+        all.push(e.target.value);
+      }
+      return Array.from(new Set(all));
+    });
+  };
+
   const renderFilteredBrands = () => {
     if (!filteredBrands || filteredBrands.length === 0) {
       return null;
@@ -58,7 +68,12 @@ function BrandSelectorCard({}: Props): ReactElement {
     return (
       <>
         {filteredBrands.map((br) => (
-          <Checkbox value={br.slug} key={br.slug} size="sm">
+          <Checkbox
+            value={br.slug}
+            onChange={handleCheck}
+            key={br.slug}
+            size="sm"
+          >
             {br.name}
           </Checkbox>
         ))}

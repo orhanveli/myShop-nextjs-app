@@ -1,6 +1,6 @@
 import Head from 'next/head';
 // import Image from 'next/image';
-import { Container, Flex, Stack } from '@chakra-ui/react';
+import { Container, Heading, Flex, Stack } from '@chakra-ui/react';
 
 import SidebarLeft from '../components/shared/SidebarLeft';
 
@@ -17,7 +17,11 @@ export default function Home() {
           <Flex w="296px">
             <SidebarLeft />
           </Flex>
-          <Flex flexGrow={1}>content</Flex>
+          <Flex flexGrow={1}>
+            <Heading as="h2" size="lg" marginBottom="4">
+              Products
+            </Heading>
+          </Flex>
           <Flex w="296px">sidebar</Flex>
         </Stack>
       </Container>
