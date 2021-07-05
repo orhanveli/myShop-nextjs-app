@@ -1,8 +1,7 @@
 export const config = {
   api: {
-    apiKey: '3B6E3963-CA80-42D2-9A45-0605A7BF242D',
-    baseUrl: 'http://localhost:5100'
-    // baseUrl: 'https://custom-mock-server.herokuapp.com'
+    apiKey: process.env.apiKey ?? '',
+    baseUrl: process.env.baseUrl || 'http://localhost:5100'
   },
   ui: {
     sortOptions: [
