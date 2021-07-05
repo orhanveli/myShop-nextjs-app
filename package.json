@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "next lint",
     "json-server": "json-server -p 5100 -d 300 -i slug --read-only ./json-data/db.json"
   },
