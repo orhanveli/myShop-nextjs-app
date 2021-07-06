@@ -7,7 +7,11 @@ import {
   Stack,
   SimpleGrid,
   Skeleton,
-  ButtonProps
+  ButtonProps,
+  Button,
+  useBreakpointValue,
+  useDisclosure,
+  Collapse
 } from '@chakra-ui/react';
 import {
   Container as PaginatorContainer,
@@ -19,7 +23,7 @@ import {
 } from 'chakra-paginator';
 
 import SidebarLeft from '../components/shared/SidebarLeft';
-import TagList from '../components/items/ItemTypeSelector';
+import ItemTypeSelector from '../components/items/ItemTypeSelector';
 import ProductList from '../components/items/ProductList';
 import { useAppSelector } from '../utils/hooks';
 import { selectProductsFilters } from '../features/products/products.slice';
@@ -27,10 +31,15 @@ import { ReactElement, useEffect, useMemo, useState } from 'react';
 import { getProductsList } from '../features/products/product.api';
 import { ShopProduct } from '../features/products/product.models';
 import { config } from '../constants';
+import { printSortLabel } from '../utils';
 
 export function Home(): ReactElement {
   const productsFilters = useAppSelector(selectProductsFilters);
 
+  const filteringOptionsVisible = useBreakpointValue({ base: false, md: true });
+  const { isOpen, onToggle, onOpen, onClose } = useDisclosure();
+
+  // const [state, setstate] = useState(initialState)
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<ShopProduct[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -85,7 +94,6 @@ export function Home(): ReactElement {
         brands: productsFilters.selectedBrands,
         page: 1
       });
-      console.log(productListResponse);
       setProducts(productListResponse.products);
       setTotalCount(productListResponse.total);
     } catch (error) {
@@ -102,6 +110,14 @@ export function Home(): ReactElement {
     productsFilters.selectedTags,
     productsFilters.selectedItemTypes
   ]);
+
+  useEffect(() => {
+    if (filteringOptionsVisible) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [filteringOptionsVisible]);
 
   const skeleton = useMemo(
     () => (
@@ -140,16 +156,43 @@ export function Home(): ReactElement {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container maxW="container.xl">
-        <Stack spacing="16px" direction="row" py="6">
-          <Flex w="296px" flexShrink={0}>
-            <SidebarLeft />
-          </Flex>
+        <Stack spacing="16px" direction={['column', 'row']} py="6">
+          <Box
+            bg="white"
+            p={4}
+            flexDirection="column"
+            display={{ base: 'flex', md: 'none' }}
+          >
+            <p>
+              <strong>Sort:</strong> {printSortLabel(productsFilters.orderBy)}
+              {productsFilters.selectedTags.length > 0 ? (
+                <>
+                  <br />
+                  <strong>Tags:</strong> {productsFilters.selectedTags}
+                </>
+              ) : null}
+              {productsFilters.selectedBrands.length > 0 ? (
+                <>
+                  <br />
+                  <strong>Brands:</strong> {productsFilters.selectedBrands}
+                </>
+              ) : null}
+            </p>
+            <Button size="xs" variant="link" onClick={onToggle}>
+              Show filtering options
+            </Button>
+          </Box>
+          <Collapse in={isOpen} animateOpacity>
+            <Flex w={['full', '296px']} flexShrink={0}>
+              <SidebarLeft />
+            </Flex>
+          </Collapse>
           <Flex flexGrow={1} direction="column">
             <Heading as="h2" size="lg" mb="4">
               Products
             </Heading>
             <Box mb={4}>
-              <TagList />
+              <ItemTypeSelector />
             </Box>
             <Box p={4} bg="white">
               {loading ? skeleton : <ProductList products={products} />}
@@ -179,7 +222,7 @@ export function Home(): ReactElement {
               </Paginator>
             </Box>
           </Flex>
-          <Flex w="296px" flexShrink={0}>
+          <Flex w={['full', '296px']} flexShrink={0}>
             sidebar
           </Flex>
         </Stack>

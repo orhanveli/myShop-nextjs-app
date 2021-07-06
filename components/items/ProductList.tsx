@@ -20,7 +20,7 @@ function ProductList({ products }: Props): ReactElement {
 
   return (
     <>
-      <SimpleGrid columns={4} spacing="16px">
+      <SimpleGrid columns={[2, 4]} spacing="16px">
         {products.map((product) => (
           <ProductCard
             productInfo={product}

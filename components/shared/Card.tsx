@@ -6,7 +6,6 @@ interface Props extends PropsWithChildren<BoxProps> {}
 function Card({ children, ...rest }: Props): ReactElement {
   return (
     <Box
-      maxW={'270px'}
       w={'full'}
       padding="4"
       bg={useColorModeValue('white', 'gray.800')}
