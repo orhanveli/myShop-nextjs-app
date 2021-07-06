@@ -3,10 +3,12 @@ import { Heading, Container, Flex, Box, Button } from '@chakra-ui/react';
 import { MdShoppingCart } from 'react-icons/md';
 
 import { currencyFormatter } from '../../utils';
+import { useAppSelector } from '../../utils/hooks';
+import { selectCart } from '../../features/cart/cart.slice';
 
-interface Props {}
+function Topbar(): ReactElement {
+  const cart = useAppSelector(selectCart);
 
-function Topbar({}: Props): ReactElement {
   return (
     <>
       <Box bg="cyan.500" color="white">
@@ -24,7 +26,7 @@ function Topbar({}: Props): ReactElement {
                 colorScheme="blackAlpha"
                 variant="outline"
               >
-                {currencyFormatter.format(0)}
+                {currencyFormatter.format(cart.total)}
               </Button>
             </Flex>
           </Flex>

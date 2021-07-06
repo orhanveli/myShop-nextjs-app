@@ -23,6 +23,7 @@ import {
 } from 'chakra-paginator';
 
 import SidebarLeft from '../components/shared/SidebarLeft';
+import Cart from '../components/cart/Cart';
 import ItemTypeSelector from '../components/items/ItemTypeSelector';
 import ProductList from '../components/items/ProductList';
 import { useAppSelector } from '../utils/hooks';
@@ -222,8 +223,8 @@ export function Home(): ReactElement {
               </Paginator>
             </Box>
           </Flex>
-          <Flex w={['full', '296px']} flexShrink={0}>
-            sidebar
+          <Flex w={['full', '296px']} alignItems="flex-start" flexShrink={0}>
+            <Cart />
           </Flex>
         </Stack>
       </Container>
